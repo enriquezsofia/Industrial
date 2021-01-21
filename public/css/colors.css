@@ -1,0 +1,173 @@
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+html {
+    display: table;
+    margin: auto;
+}
+
+body {
+    display: table-cell;
+    vertical-align: middle;
+    background-color: #FAFAFA;
+}
+
+/* Buttons */
+.btn, .btn:focus, .btn:active, .btn:active:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.white {
+    color: white;
+}
+
+.white:hover {
+    color: white;
+}
+
+.btn-inicio {
+    background-color: #3B9E3C;
+    border-color: #3B9E3C;
+}
+
+.btn-cancelar {
+    background-color: #EB5A3F;
+    border-color: #EB5A3F;
+}
+
+.btn-pausa {
+    background-color: #c7c7c7;
+    border-color: #c7c7c7;
+}
+
+/* Buttons on hover */
+.btn-inicio:hover {
+    background-color: #277429;
+    border-color: #277429;
+}
+
+.btn-cancelar:hover {
+    background-color: #c43c24;
+    border-color: #c43c24;
+}
+
+.btn-pausa:hover {
+    background-color: #A4A4A4;
+    border-color:#A4A4A4;
+}
+
+/* Buttons on focus */
+/* .btn-success:focus {
+    background-color: #277429;
+    border-color: #277429;
+    
+}
+
+.btn-danger:focus {
+    background-color: #c43c24;
+    border-color: #c43c24;
+}
+
+.btn-secondary:focus {
+    background-color: #A4A4A4;
+    border-color:#A4A4A4;
+} */
+
+/* Boton activo de estado (inicio, pausar, cancelar) */
+/* Inicio */
+.btn-OnInicio {
+    border-color: #277429;
+    border-width: medium;
+    font-weight: bold;
+}
+/* Pausa */
+.btn-OnPausa {
+    border-color: #A4A4A4;
+    border-width: medium;
+    font-weight: bold;
+}
+/* Cancelar */
+.btn-OnCancelar {
+    border-color: #c43c24;
+    border-width: medium;
+    font-weight: bold;
+}
+
+/* Botones de pestaña */
+.btn-pestana {
+    background-color: #b1b1b1;
+    border-color: #b1b1b1;
+}
+
+.btn-pestana:hover {
+    background-color: #727272;
+    border-color: #727272;
+}
+
+.pestanaActiva {
+    background-color: #4e4e4e !important;
+    border-color: #4e4e4e !important;
+    color: white;
+    font-weight: bold;
+}
+
+/* Boton de canales */
+.btn-channel {
+    background-color: #8BA0CB;
+    border-color: #8BA0CB;
+}
+
+.btn-channel:hover {
+    background-color: #4A669E;
+    border-color: #4A669E;
+}
+
+.canalActivo {
+    background-color: #364974;
+    border-color: #364974;
+    color: white;
+    font-weight: bold;
+}
+
+/* Botones de numeros */
+.btn-numero {
+    background-color: #E7E7E7;
+    border-color: #E7E7E7;
+    color: black;
+}
+
+.btn-numero:hover {
+    background-color: #D5D5D5;
+    border-color: #D5D5D5;
+}
+
+/* Boton de exportar */
+.btn-exportar {
+    background-color: #FFD53C;
+    border-color: #FFD53C;
+}
+
+.btn-exportar:hover {
+    background-color: #f3c727;
+    border-color: #f3c727;
+}
+
+/* Inputs de cantidad requerida y cargada */
+.displayBox {
+    padding: 5px;
+    border-radius: 5px;
+    border-color: #E7E7E7;
+    border-width: thin;
+    border-style: solid;
+}
+
+/* on focus */
+.display {
+    border-color: #cdcfd6;
+    border-width: medium;
+    outline: none;
+    box-shadow: none;
+}

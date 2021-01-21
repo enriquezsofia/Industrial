@@ -1,0 +1,58 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.textLarge {
+  font-size: large;
+}
+
+.rightFloat {
+  float: right;
+}
+
+.leftFloat {
+  float: left;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=text] {
+  text-align: center;
+  font-size: large;
+  outline: none;
+  box-shadow: none;
+}
+
+input[type=text]:focus {
+  outline: none;
+  box-shadow: none;
+  border-color: #cdcfd6;
+}
+
+.btnNumbers div button{
+  width: 100%;
+  font-size: large;
+  margin-bottom: 1vh;
+}
+
+.divCantidad label {
+  float: right;
+}
+
+.textResaltado {
+  font-size: xx-large;
+  color: #364974;
+}
+
+.hidden {
+  display: none;
+}
