@@ -1,8 +1,46 @@
 var socket = io('http://localhost:3000');
 
 window.onload = function() {
-    // document.getElementById('reportes').style.display = "none"; 
+
 }
+
+
+// *************** VARIABLES
+// Para Displays de Cantidad Requerida y Cargada
+var cantRequerida = document.getElementById('cantRequerida');
+var cantCargado = document.getElementById('cantCargado');
+var cantidad = '';
+var boolReq = false;
+var boolCar = false;
+
+// Para Estados (Inicio, Pausa y Cancelar)
+var btnInicio = document.getElementById('btnInicio');
+var btnPausa = document.getElementById('btnPausa');
+var btnCancelar = document.getElementById('btnCancelar');
+// Estados 
+// 1 - Inicio
+// 2 - Pausado
+// 3 - Cancelado
+// 4 - Sin estado
+// Canales y su estado
+var canal = 1;
+var estados = [
+    {channel: 1, status: 4},
+    {channel: 2, status: 4},
+    {channel: 3, status: 4},
+    {channel: 4, status: 4},
+
+];
+
+// Canales y su cantidad Requerida
+var displays = [
+    {channel: 1, cantReq: 0},
+    {channel: 2, cantReq: 0},
+    {channel: 3, cantReq: 0},
+    {channel: 4, cantReq: 0},
+];
+
+// *************** FIN DE VARIABLES
 
 // SOCKETS
 socket.on('estado', data => {
@@ -11,6 +49,12 @@ socket.on('estado', data => {
     updateEstado(obj.status);
 });
 
+socket.on('cantidades', data => {
+    displays = data;
+    console.log('cliente:', displays);
+    updateDisplay();
+
+});
 
 // HORA
 var clockElement = document.getElementById('txtDate');
@@ -71,8 +115,15 @@ function cambioCanal(canal){
             this.canal = i;
             //Cambiar boton de estado segun el canal
             var res = estados.find(f => f.channel == i);
-            updateEstado(res.status);
-            
+
+            //Limpiar displays
+            cantidad = '';
+            cantRequerida.value = '';
+            cantCargado.value = '';
+
+            //Cambiar contenido del canal
+            updateEstado(res.status);    
+            updateDisplay();        
         }
         if(count!=canal) {
             document.getElementById(`btn${count}`).classList.remove('canalActivo');
@@ -97,11 +148,6 @@ function focusChanged(display) {
 }
 
 // NUMERO EN DISPLAY
-var cantRequerida = document.getElementById('cantRequerida');
-var cantCargado = document.getElementById('cantCargado');
-var cantidad = '';
-var boolReq = false;
-var boolCar = false;
 function numeroPressed(num) {
     if(num!='clear') {    
         cambiarCantidad(num);
@@ -111,6 +157,7 @@ function numeroPressed(num) {
     writeCantidad();
 }
 
+// CIFRAS CON TECLADO
 function cambiarCantidad(num) {
     // Si se borra alguna cifra con backspace se actualiza Cantidad
     if(boolReq) {
@@ -143,7 +190,7 @@ function onlyNumberKey(evt) {
     }
 }
 
-// CANTIDAD EN INPUT
+// CANTIDAD MOSTRADA EN INPUT DISPLAY
 function writeCantidad() {
     if(boolReq) {
         cantRequerida.value = cantidad;
@@ -151,42 +198,67 @@ function writeCantidad() {
     if(boolCar) {
         cantCargado.value = cantidad;
     }
+    writeCantidad_socket();
+}
+
+// GUARDAR CANTIDADES EN ARREGLO Y PASARLAS MEDIANTE SOCKETS
+function writeCantidad_socket() {
+    //*** */ NOTE: falta que se borre al borrar con backspace
+    var currentChannel = displays.find(f => f.channel == canal);
+    if(currentChannel){
+        currentChannel.cantReq = parseFloat(cantRequerida.value);
+        socket.emit('cantidades', displays);
+        
+    }
+}
+
+// ACTUALIZAR DISPLAYS MEDIANTE SOCKETS
+function updateDisplay() {
+    var currentChannel = displays.find(f => f.channel == canal);
+    if(currentChannel){
+        cantRequerida.value = currentChannel.cantReq;
+    }
 }
 
 // FOCUS PARA ESTADO ACTUAL (INICIO, PAUSADO O CANCELADO)
-var btnInicio = document.getElementById('btnInicio');
-var btnPausa = document.getElementById('btnPausa');
-var btnCancelar = document.getElementById('btnCancelar');
-// Estado 
-// 1 - Inicio
-// 2 - Pausado
-// 3 - Cancelado
-// 4 - Sin estado
-// Canales y su estado
-var canal = 1;
-var estados = [
-    {channel: 1, status: 4},
-    {channel: 2, status: 4},
-    {channel: 3, status: 4},
-    {channel: 4, status: 4},
-
-];
-
 function updateEstado(status) {
     switch(status) {
         case 1: 
             onInicio();
+
+            // Se habilitan botones de Pausa y cancelar
+            btnPausa.disabled = false;
+            btnCancelar.disabled = false;
+
+            // Se deshabilita boton de inicio
+            btnInicio.disabled = true;
         break;
         case 2:
             onPausa();
+
+            //Se deshabilita boton de inicio
+            btnInicio.disabled = true;
+            btnPausa.disabled = false;
+            btnCancelar.disabled = false;
         break;
         case 3:
             onCancelar();
+
+            //Se habilitan todos los botones
+            btnInicio.disabled = false;
+            btnPausa.disabled = false;
+            btnCancelar.disabled = false;
+
+            setTimeout(() => {updateEstado(4);}, 1000);
         break;
         case 4:
             btnInicio.classList.remove('btn-OnInicio');
             btnPausa.classList.remove('btn-OnPausa');
             btnCancelar.classList.remove('btn-OnCancelar');  
+
+            //Cuando se encuentre sin estado, solo podra darle a Inicio, por lo que se desactiva el de Pausa y Cancelar
+            btnPausa.disabled = true;
+            btnCancelar.disabled = true;
         break;
     }
 
