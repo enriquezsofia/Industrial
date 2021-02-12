@@ -16,7 +16,7 @@
       <div class="row mb-4 displayBox">
         <p class="textLarge">Requerida</p>
         <input type="text" pattern="[1-9][0-9]*([.][0-9]?)?" class="form-control" min="0" id="cantRequerida" 
-        onfocus="focusChanged('requerido')" onkeypress="return onlyNumberKey(event)">
+        onfocus="focusChanged('requerido')" onkeypress="return onlyNumberKey(event)" onkeydown="backspaceEvent(event)">
       </div>
       <div class="row mb-2 displayBox">
         <p class="textLarge">Cargado</p>
@@ -92,23 +92,8 @@
             <th scope="col">Pulsos</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <th scope="row">16/12/2020 00:45</th>
-            <td>20.15</td>
-            <td>10.15</td>
-            <td>finalizado</td>
-            <td>00:01:15</td>
-            <td>200</td>
-          </tr>
-          <tr>
-            <th scope="row">16/12/2020 00:45</th>
-            <td>20.15</td>
-            <td>10.15</td>
-            <td>finalizado</td>
-            <td>00:01:15</td>
-            <td>200</td>
-          </tr>
+        <tbody id="bodyReportes">
+          
         </tbody>
       </table>
       <!-- Fin de tabla de reportes -->
