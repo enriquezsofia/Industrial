@@ -1,7 +1,7 @@
 var socket = io('http://localhost:3000');
 
 window.onload = function() {
-
+   
 }
 
 
@@ -26,41 +26,26 @@ var btnCancelar = document.getElementById('btnCancelar');
 // 2 - Pausado
 // 3 - Cancelado
 // 4 - Sin estado
-// Canales y su estado
+// Variable de array de canales y su estado
 var canal = 1;
 var arrCanales;
-// EJ
-// var arrCanales = [
-//     {channel: 1, status: 4, startTime: ''},
-//     {channel: 2, status: 4, startTime: ''},
-//     {channel: 3, status: 4, startTime: ''},
-//     {channel: 4, status: 4, startTime: ''},
 
-// ];
+// Variable de array de canales y su cantidad Requerida
+var arrdisplays;
 
-// Canales y su cantidad Requerida
-var displays;
-//EJ
-// var displays = [
-//     {channel: 1, cantReq: 0},
-//     {channel: 2, cantReq: 0},
-//     {channel: 3, cantReq: 0},
-//     {channel: 4, cantReq: 0},
-// ];
-
-// Reportes
+// Variable de array Reportes
 var arrReportes;
 // *************** FIN DE VARIABLES
 
 // *************** SOCKETS
 socket.on('estado', data => {
     arrCanales = data;
-    var obj = arrCanales.find(f => f.channel == canal);
+    var obj = getArrayCanal();
     updateEstado(obj.status);
 });
 
 socket.on('cantidades', data => {
-    displays = data;
+    arrdisplays = data;
     updateDisplay();
 
 });
@@ -107,6 +92,16 @@ function formatDate(unformatDate) {
     return date+' '+time;
 }
 
+// METODO PARA OBTENER DISPLAYS DEPENDIENDO DEL CANAL ACTUAL
+function getArrayDisplays() {
+    return arrdisplays.find(f => f.canal == canal);
+}
+
+// METODO PARA OBTENER DATOS DEL CANAL DEPENDIENDO DEL CANAL ACTUAL
+function getArrayCanal() {
+    return arrCanales.find(f => f.canal == canal);
+}
+
 // CAMBIO DE PESTAÑA PRINCIPAL Y REPORTES
 function cambioVentana(ventana) {
     switch(ventana) {
@@ -119,6 +114,9 @@ function cambioVentana(ventana) {
 
             viewPrincipal = true;
             viewReportes = false;
+
+            // Cambio de elementos de canal
+            cambioCanal(`C${this.canal}`);
         break;
         case 'Reportes':
             document.getElementById('reportes').style.display = "flex";
@@ -129,6 +127,9 @@ function cambioVentana(ventana) {
 
             viewPrincipal = false;
             viewReportes = true;
+
+            // Cambio de elementos de canal
+            cambioCanal(`C${this.canal}`);
         break;
     }
 }
@@ -145,7 +146,7 @@ function cambioCanal(canal){
             // PRINCIPAL
             if(viewPrincipal) {
                 //Cambiar boton de estado segun el canal
-                var res = arrCanales.find(f => f.channel == i);
+                var res = getArrayCanal();
 
                 //Limpiar displays
                 cantidad = '';
@@ -159,8 +160,8 @@ function cambioCanal(canal){
                 cantCargado.classList.remove('display');
 
                 //Cambiar contenido del canal
+                updateDisplay();    
                 updateEstado(res.status);    
-                updateDisplay();        
             }
 
             if(viewReportes) {
@@ -178,31 +179,39 @@ function cambioCanal(canal){
 // *************** VENTANA PRINCIPAL
 // FOCUS DE REQUERIDA Y CARGADO
 function focusChanged(display) {
-    if(display == 'requerido') {
-        boolReq = true;
-        boolCar = false;
-        cantRequerida.classList.add('display');
-        cantCargado.classList.remove('display');
-        cantidad = cantRequerida.value;
-    }
-    if(display == 'cargado') {
-        boolReq = false;
-        boolCar = true;
-        cantRequerida.classList.remove('display');
-        cantCargado.classList.add('display');
-        cantidad = cantCargado.value;
+    var currentChannel = getArrayDisplays();
+
+    if (currentChannel.enableCantReq) {
+        if(display == 'requerido') {
+            boolReq = true;
+            boolCar = false;
+            cantRequerida.classList.add('display');
+            cantCargado.classList.remove('display');
+            cantidad = cantRequerida.value;
+        }
+        if(display == 'cargado') {
+            boolReq = false;
+            boolCar = true;
+            cantRequerida.classList.remove('display');
+            cantCargado.classList.add('display');
+            cantidad = cantCargado.value;
+        }
     }
 }
 
 // METODO DE NUMERO PRESIONADO (DESDE LOS BOTONES DE PANTALLA)
 function numeroPressed(num) {
-    if(num!='clear') {    
-        // Se cambia la variable cantidad
-        cambiarCantidad(num);
-    } else {
-        cantidad = '';
+    var currentChannel = getArrayDisplays();
+
+    if(currentChannel.enableCantReq) {
+        if(num!='clear') {    
+            // Se cambia la variable cantidad
+            cambiarCantidad(num);
+        } else {
+            cantidad = '';
+        }
+        writeCantidad();
     }
-    writeCantidad();
 }
 
 // METODO PARA RECIBIR NUMERO (DESDE TECLADO Y DESDE BOTONES)
@@ -216,38 +225,46 @@ function cambiarCantidad(num) {
 }
 
 function backspaceEvent(evt) {
-    var charCode = (evt.which) ? evt.which : evt.keyCode;
-    if(charCode == 8) {
-        // Borrar ultimo digito
-        cantidad = cantRequerida.value.slice(0, -1);
-        writeCantidad();
-        return true;
+    var currentChannel = getArrayDisplays();
+
+    if(currentChannel.enableCantReq) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if(charCode == 8) {
+            // Borrar ultimo digito
+            cantidad = cantRequerida.value.slice(0, -1);
+            writeCantidad();
+            return true;
+        }
+        else
+            return false;
     }
-    else
-        return false;
 }
 
 // METODO PARA ADMITIR SOLO CIFRAS NUMERICAS DESDE TECLADO
 function onlyNumberKey(evt) { 
-         
-    // Only ASCII charactar in that range allowed 
-    var charCode = (evt.which) ? evt.which : evt.keyCode;
+    
+    var currentChannel = getArrayDisplays();
 
-    if (charCode != 46 && charCode > 31 
-    && (charCode < 48 || charCode > 57))
-        return false;
-    else {
-        // La variable Cantidad se modifica cuando se introducen numeros desde teclado
-        if(boolReq) {
-            cantidad = cantRequerida.value;
-        }
-        if(boolCar) {
-            cantidad = cantCargado.value;
-        }
+    if (currentChannel.enableCantReq) {
+        // Only ASCII charactar in that range allowed 
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
 
-        cambiarCantidad(String.fromCharCode(charCode));
-        writeCantidad();
-        return false; //falso para que no se ponga varias veces el numero
+        if (charCode != 46 && charCode > 31 
+        && (charCode < 48 || charCode > 57))
+            return false;
+        else {
+            // La variable Cantidad se modifica cuando se introducen numeros desde teclado
+            if(boolReq) {
+                cantidad = cantRequerida.value;
+            }
+            if(boolCar) {
+                cantidad = cantCargado.value;
+            }
+
+            cambiarCantidad(String.fromCharCode(charCode));
+            writeCantidad();
+            return false; //falso para que no se ponga varias veces el numero
+        }
     }
 }
 
@@ -264,19 +281,30 @@ function writeCantidad() {
 
 // GUARDAR CANTIDADES EN ARREGLO Y PASARLAS MEDIANTE SOCKETS
 function writeCantidad_socket() {
-    var currentChannel = displays.find(f => f.channel == canal);
+    var currentChannel = getArrayDisplays();
     if(currentChannel){
         currentChannel.cantReq = cantRequerida.value;
-        socket.emit('cantidades', displays);
+        socket.emit('cantidades', arrdisplays);
         
     }
 }
 
 // ACTUALIZAR DISPLAYS MEDIANTE SOCKETS
 function updateDisplay() {
-    var currentChannel = displays.find(f => f.channel == canal);
-    if(currentChannel){
-        cantRequerida.value = currentChannel.cantReq;
+    var currentChannel = getArrayCanal();
+    var currentChannel_display = getArrayDisplays();
+
+    if(currentChannel_display){
+        cantRequerida.value = currentChannel_display.cantReq;
+        
+        // Si el estado del canal esta en Inicio o Pausa, el input Cantidad Requerida es ReadOnly
+        if(currentChannel.status == 1 || currentChannel.status == 2) {
+            cantRequerida.classList.remove('display');
+            cantRequerida.readOnly = true;
+        }
+        else {
+            cantRequerida.readOnly = false;
+        }
     }
 }
 
@@ -308,8 +336,6 @@ function updateEstado(status) {
             btnInicio.disabled = false;
             btnPausa.disabled = false;
             btnCancelar.disabled = false;
-
-            setTimeout(() => {updateEstado(4);}, 1000);
         break;
         case 4:
             btnInicio.classList.remove('btn-OnInicio');
@@ -320,6 +346,9 @@ function updateEstado(status) {
             btnInicio.disabled = false;
             btnPausa.disabled = true;
             btnCancelar.disabled = true;
+
+            // Metodo de Activar/Desactivar boton de inicio si el campo de Cantidad Requerida tiene texto o no
+            disableStartButton();
         break;
     }
 
@@ -342,19 +371,29 @@ function onCancelar() {
     btnCancelar.classList.add('btn-OnCancelar');
 }
 
+// METODO PARA ACTIVAR/DESACTIVAR EL BOTON DE ESTADO INICIO SI EL CAMPO DE CANTIDAD REQUERIDA TIENE TEXTO O NO
+function disableStartButton() {
+    cantRequerida.value.length > 0 ? btnInicio.disabled = false : btnInicio.disabled = true;
+}
+
 // METODO PARA CAMBIAR EL ESTADO SEGUN EL CANAL ACTUAL
 // SE ACTUALIZAN LOS DATOS POR CANAL
-
 // Note: actualizar hora de inicio cuando ha sido pausado, para reiniciar la duracion.
-// Note: cuando esta en una ventana (principal) y se cambia entre canales y luego va a reportes, no se actualizan los reportes del
-// canal al que se habia cambiado previamente. Y viceversa
 function updateEstado_socket(status) {
-    var currentChannel = arrCanales.find(f => f.channel == canal);
+    var currentChannel = getArrayCanal();
+    var currentChannel_display = getArrayDisplays();
+
     if(currentChannel){
         currentChannel.status = status;
         if(status == 1){
             currentChannel.startTime = new Date();
             currentChannel.cantReq = cantRequerida.value;
+
+            // Se cambia a false el bool para no permitir cambios en el input Cantidad Requerida
+            currentChannel_display.enableCantReq = false;
+
+            // Se actualizan los display para que el input Cantidad Requerida solo sea ReadOnly
+            updateDisplay();
         }
         if(status == 2) {
             // Reporte con estado Pausado y su duracion
@@ -364,14 +403,29 @@ function updateEstado_socket(status) {
             // Reporte con estado Cancelado y su duracion
             newReporte(currentChannel, setCountTime(currentChannel.startTime));
 
-            // Despues de generar reporte, se regresa a sin estado y se borran los campos de cantidad
-            // Note: falta borrar los campos
+            // Despues de generar reporte, se regresa a sin estado y se limpia la cantidad requerida
             updateEstado(status);
             currentChannel.status = 4;
-        }
-        if(status == 4){
+            currentChannel.cantReq = null;
+
+            // El Estado actual ha cambiado a Sin Estado (4)
+            // Se limpia el tiempo de inicio y la duracion
             currentChannel.startTime = '';
             currentChannel.duration = '';
+
+            // Se limpian los campos de Cantidad Requerida y Cargada
+            cantRequerida.value = '';
+            cantCargado.value = '';
+
+            // El array que guarda las cantidades tambien se limpia
+            currentChannel_display.cantReq = null;
+
+            // Se cambia a true el bool para permitir cambios en el input Cantidad Requerida
+            currentChannel_display.enableCantReq = true;
+
+            // Se actualizan los display para remover el ReadOnly del input Cantidad Requerida
+            updateDisplay();
+
         }
         updateEstado(status);
     }
@@ -426,11 +480,7 @@ function loadReportes() {
 
 // GUARDAR NUEVO REPORTE POR CANAL
 // Note: Aun no hay reportes con estado Finalizado ya que es cuando la cantidad Cargada alcance la Requerida
-// Note: cambiar Cantidad Requerida a Read Only cuando el estado sea Inicio o Pausa
-// Note: no iniciar si no hay una cantidad en Requerida
 function newReporte(channel, duration) {
-    //var reportes = `reportesC${this.canal}`;
-
     // Estado en Texto
     var estado = '';
     if(channel.status == 2)
@@ -445,7 +495,7 @@ function newReporte(channel, duration) {
     startTime = formatDate(startTime);
 
     // Guardar el reporte en el arreglo
-    arrReportes.push({canal:channel.channel, fecha: startTime, requerido: channel.cantReq, cargado: '-', estatus: estado, duracion: duration, pulsos: '-'});
+    arrReportes.push({canal:channel.canal, fecha: startTime, requerido: channel.cantReq, cargado: '-', estatus: estado, duracion: duration, pulsos: '-'});
 
     //actualizar reportes en socket
     socket.emit('reportes', arrReportes);

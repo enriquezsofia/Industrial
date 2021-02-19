@@ -1,17 +1,17 @@
 var io = require('socket.io')();
 
 var arrCanales = [
-    {channel: 1, cantReq: null, status: 4, startTime: ''},
-    {channel: 2, cantReq: null, status: 4, startTime: ''},
-    {channel: 3, cantReq: null, status: 4, startTime: ''},
-    {channel: 4, cantReq: null, status: 4, startTime: ''},
+    {canal: 1, cantReq: null, status: 4, startTime: ''},
+    {canal: 2, cantReq: null, status: 4, startTime: ''},
+    {canal: 3, cantReq: null, status: 4, startTime: ''},
+    {canal: 4, cantReq: null, status: 4, startTime: ''},
 ];
 
 var channelDisplays = [
-	{channel: 1, cantReq: null},
-    {channel: 2, cantReq: null},
-    {channel: 3, cantReq: null},
-    {channel: 4, cantReq: null},
+	{canal: 1, cantReq: null, enableCantReq: true},
+    {canal: 2, cantReq: null, enableCantReq: true},
+    {canal: 3, cantReq: null, enableCantReq: true},
+    {canal: 4, cantReq: null, enableCantReq: true},
 ]
 
 // Se traeran desde BD, por mientras son simples arrays

@@ -16,7 +16,8 @@
       <div class="row mb-4 displayBox">
         <p class="textLarge">Requerida</p>
         <input type="text" pattern="[1-9][0-9]*([.][0-9]?)?" class="form-control" min="0" id="cantRequerida" 
-        onfocus="focusChanged('requerido')" onkeypress="return onlyNumberKey(event)" onkeydown="backspaceEvent(event)">
+        onfocus="focusChanged('requerido')" onkeypress="return onlyNumberKey(event)" onkeydown="backspaceEvent(event)"
+        onkeyup="disableStartButton()">
       </div>
       <div class="row mb-2 displayBox">
         <p class="textLarge">Cargado</p>
