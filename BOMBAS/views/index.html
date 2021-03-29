@@ -21,8 +21,7 @@
       </div>
       <div class="row mb-2 displayBox">
         <p class="textLarge">Cargado</p>
-        <input type="text" pattern="[1-9][0-9]*([.][0-9]?)?" class="form-control" min="0" id="cantCargado" 
-        onfocus="focusChanged('cargado')" onkeypress="return onlyNumberKey(event)">
+        <input type="text" pattern="[1-9][0-9]*([.][0-9]?)?" class="form-control" min="0" id="cantCargado" value="0" readonly>
       </div>
     </div>
     <!-- Numeros -->
@@ -69,9 +68,9 @@
     <!-- Fin de numeros -->
     <div class="col-4">
       <div class="d-grid gap-2">
-        <button type="button" class="btn btn-inicio btn-lg white" id="btnInicio" onclick="updateEstado_socket(1)">Inicio</button>
-        <button type="button" class="btn btn-pausa btn-lg white" id="btnPausa" onclick="updateEstado_socket(2)">Pausar</button>
-        <button type="button" class="btn btn-cancelar btn-lg white" id="btnCancelar" onclick="updateEstado_socket(3)">Cancelar</button>
+        <button type="button" class="btn btn-inicio btn-lg white" id="btnInicio" onclick="updateEstado(1)">Inicio</button>
+        <button type="button" class="btn btn-pausa btn-lg white" id="btnPausa" onclick="updateEstado(2)">Pausar</button>
+        <button type="button" class="btn btn-cancelar btn-lg white" id="btnCancelar" onclick="updateEstado(3)">Cancelar</button>
         <label class="textLarge textResaltado">2500.55</label>
       </div>
     </div>
