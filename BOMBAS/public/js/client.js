@@ -42,12 +42,11 @@ var arrReportes;
 socket.on('estado', data => {
     arrCanales = data;
     var obj = getArrayCanal(canal);
-    updateEstado(obj.status);
+    updateEstado_design(obj.status);
 });
 
 socket.on('cantidades', data => {
     arrdisplays = data;
-    console.log('server displays', arrdisplays);
     updateDisplay();
 
 });
@@ -96,7 +95,6 @@ function formatDate(unformatDate) {
 
 // METODO PARA OBTENER DISPLAYS DEPENDIENDO DEL CANAL ACTUAL
 function getArrayDisplays(canal) {
-    console.log(arrdisplays);
     return arrdisplays.find(f => f.canal == canal);
 }
 
@@ -149,7 +147,7 @@ function cambioCanal(canal) {
             // PRINCIPAL
             if(viewPrincipal) {
                 //Cambiar boton de estado segun el canal
-                var res = getArrayCanal(canal);
+                var res = getArrayCanal(this.canal);
 
                 // Note: creo que puede borrarse esto
                 //Limpiar displays
@@ -181,6 +179,11 @@ function cambioCanal(canal) {
 
 
 // *************** VENTANA PRINCIPAL
+// CALCULO DE CANTIDAD TOTAL QUE APARECE EN PANTALLA PRINCIPAL
+function calcularTotal() {
+    
+}
+
 // FOCUS DE REQUERIDA Y CARGADO
 function focusChanged(display) {
     var currentChannel = getArrayDisplays(canal);
@@ -530,7 +533,13 @@ function newReporte(channel, duration) {
 
 // metodo temporal para provar el input de Cantidad Cargada y que reportes se generen al igualar cantidad Cargada = Requerida
 // con estado de Finalizado
-var countCargado;
+// note: LOS INTERVALOS SON PRUEBAS COMO SI ESTUVIERA RECIBIENDO DATOS
+
+// IDs para Intervalos por Canal
+var intC1, intC2, intC3, intC4;
+// IDs para counts de Cantidad Cargada por Canal
+var countCarC1, countCarC2, countCarC3, countCarC4;
+
 function pruebaCantCargada() {
     //var countCargado = cantCargado.value;
     countCargado = 0;
@@ -538,18 +547,26 @@ function pruebaCantCargada() {
     aumentar();
 }
 
+var activeTimers = 0;
 function aumentar() {
     // Se crea un nombre de variable para el Intervalo segun el canal en el que se haya iniciado el proceso
     var idInterval = `intC${this.canal}`;
+    var countCargado = `countCarC${this.canal}`;
+    activeTimers++;
+
     window[idInterval] = setInterval(function() {
-    countCargado++;
-    cantCargado.value = countCargado;
+    window[countCargado]++;
+    cantCargado.value = window[countCargado];
+
+    console.log('active timers',activeTimers);
 
     // Validar si Cantidad Cargada es igual a Cantidad Requerida
+    // note: que lo valide desde los campos en el ARREGLO por CANAL
     if(cantCargado.value == cantRequerida.value) {
         //Note: que se cambie de estado a FINALIZADO y luego a SIN ESTADO
         console.log('es igual');
         clearInterval(window[idInterval]);
+        window[countCargado] = 0;
 
         //Generar reporte 
         //Se omite el metodo para obtener el canal actual, ya que podría ser de otro canal donde ya se hayan igualado las cantidades
@@ -557,8 +574,8 @@ function aumentar() {
         var canal = idInterval.substring(4);
         updateEstado_socket(5, canal);
          
-        
-        
+        activeTimers--;
+        console.log('active timers',activeTimers);
     }
    }, 500);
 }
